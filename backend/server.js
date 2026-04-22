@@ -10,12 +10,13 @@ if (!CLIENT_URL) {
   throw new Error("Missing required env var: CLIENT_URL");
 }
 
-app.use(
-  cors({
-    origin: CLIENT_URL,
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    process.env.CLIENT_URL
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
