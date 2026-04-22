@@ -5,29 +5,46 @@ require("dotenv").config();
 
 const app = express();
 
+// ENV
 const CLIENT_URL = process.env.CLIENT_URL;
+const PORT = Number(process.env.PORT) || 3000;
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 
-if (!CLIENT_URL) {
-  throw new Error("Missing required env var: CLIENT_URL");
+// ✅ SAFE ORIGIN LIST (no crash if env missing)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://webapp1-weld.vercel.app",
+];
+
+if (CLIENT_URL) {
+  allowedOrigins.push(CLIENT_URL);
 }
 
-// ✅ CORS FIRST
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://webapp1-weld.vercel.app"
-  ],
-  credentials: true
-}));
+// ✅ CORS CONFIG (robust)
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
 
-// 🔥 ADD THIS LINE (THIS IS YOUR MISSING PIECE)
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS not allowed"), false);
+      }
+    },
+    credentials: true,
+  })
+);
+
+// ✅ HANDLE PREFLIGHT REQUESTS
 app.options("*", cors());
 
-// ✅ THEN body parsers
+// ✅ BODY PARSERS
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// routes
+// ROUTES
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const eventRoutes = require("./routes/eventRoutes");
@@ -41,6 +58,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/users", userRoutes);
 
+// HEALTH CHECK
 app.get("/", (_req, res) => {
   res.status(200).json({ message: "OK" });
 });
@@ -49,9 +67,7 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ ok: true });
 });
 
-const PORT = Number(process.env.PORT) || 3000;
-const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
-
+// START SERVER
 async function start() {
   if (!MONGO_URI) {
     throw new Error("Missing required env var: MONGO_URI");
@@ -60,13 +76,11 @@ async function start() {
   await mongoose.connect(MONGO_URI);
 
   app.listen(PORT, () => {
-    if (process.env.NODE_ENV !== "production") {
-      console.info(`API listening on port ${PORT}`);
-    }
+    console.log(`Server running on port ${PORT}`);
   });
 }
 
 start().catch((err) => {
   console.error("Failed to start server:", err);
-  process.exitCode = 1;
+  process.exit(1);
 });
