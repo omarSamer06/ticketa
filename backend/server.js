@@ -13,10 +13,11 @@ if (!CLIENT_URL) {
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    process.env.CLIENT_URL
+    "https://your-app.vercel.app"
   ],
   credentials: true
 }));
+app.options("*", cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
