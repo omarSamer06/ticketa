@@ -13,7 +13,7 @@ if (!CLIENT_URL) {
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://your-app.vercel.app"
+    "https://webapp1-weld.vercel.app"
   ],
   credentials: true
 }));
