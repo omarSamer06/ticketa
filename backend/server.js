@@ -20,25 +20,24 @@ if (CLIENT_URL) {
   allowedOrigins.push(CLIENT_URL);
 }
 
-// ✅ CORS CONFIG (robust)
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (like Postman)
-      if (!origin) return callback(null, true);
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://webapp1-weld.vercel.app"
+  ],
+  credentials: true
+}));
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("CORS not allowed"), false);
-      }
-    },
-    credentials: true,
-  })
-);
-
-// ✅ HANDLE PREFLIGHT REQUESTS
-app.options("/*", cors());
+// ✅ Handle preflight properly WITHOUT wildcard route
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // ✅ BODY PARSERS
 app.use(express.json());
