@@ -4,12 +4,14 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = express();
+
 const CLIENT_URL = process.env.CLIENT_URL;
 
 if (!CLIENT_URL) {
   throw new Error("Missing required env var: CLIENT_URL");
 }
 
+// ✅ CORS FIRST
 app.use(cors({
   origin: [
     "http://localhost:5173",
@@ -17,9 +19,15 @@ app.use(cors({
   ],
   credentials: true
 }));
+
+// 🔥 ADD THIS LINE (THIS IS YOUR MISSING PIECE)
+app.options("*", cors());
+
+// ✅ THEN body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// routes
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const eventRoutes = require("./routes/eventRoutes");
@@ -53,14 +61,12 @@ async function start() {
 
   app.listen(PORT, () => {
     if (process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
       console.info(`API listening on port ${PORT}`);
     }
   });
 }
 
 start().catch((err) => {
-  // eslint-disable-next-line no-console
   console.error("Failed to start server:", err);
   process.exitCode = 1;
 });
