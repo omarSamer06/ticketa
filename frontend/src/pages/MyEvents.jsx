@@ -24,6 +24,52 @@ function formatPrice(price) {
   }).format(amount);
 }
 
+function StatusBadge({ status }) {
+  const styles = {
+    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    approved: "bg-green-100 text-green-800 border-green-200",
+    rejected: "bg-red-100 text-red-800 border-red-200",
+  };
+  return (
+    <span className={`inline-block rounded-full border px-2 py-0.5 text-xs font-semibold capitalize ${styles[status] || "bg-slate-100 text-slate-700"}`}>
+      {status || "unknown"}
+    </span>
+  );
+}
+
+function AnalyticsBar({ eventId }) {
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    let isActive = true;
+    api.get(`/api/events/${eventId}/analytics`)
+      .then((res) => {
+        if (isActive) setAnalytics(res?.data?.data || null);
+      })
+      .catch(() => {});
+    return () => { isActive = false; };
+  }, [eventId]);
+
+  if (!analytics) return null;
+
+  const { bookedTickets, totalTickets, percentageBooked } = analytics;
+
+  return (
+    <div className="mt-3">
+      <p className="text-sm text-slate-600">
+        Booked: <span className="font-semibold text-slate-900">{bookedTickets} / {totalTickets}</span>
+        <span className="ml-2 text-slate-500">({percentageBooked}%)</span>
+      </p>
+      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+        <div
+          className="h-full rounded-full bg-slate-800 transition-all"
+          style={{ width: `${percentageBooked}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function MyEvents() {
   const { user } = useAuth();
   const [events, setEvents] = useState([]);
@@ -139,10 +185,13 @@ export default function MyEvents() {
             {events.map((event) => (
               <article key={event.id} className="rounded-2xl bg-white p-6 shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold text-slate-900">
-                      {event.title}
-                    </h2>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-semibold text-slate-900">
+                        {event.title}
+                      </h2>
+                      <StatusBadge status={event.status} />
+                    </div>
                     <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
                       <div>
                         <dt className="font-medium text-slate-900">Date</dt>
@@ -161,6 +210,7 @@ export default function MyEvents() {
                         <dd>{event.remainingTickets}</dd>
                       </div>
                     </dl>
+                    <AnalyticsBar eventId={event.id} />
                   </div>
 
                   <div className="flex gap-3">

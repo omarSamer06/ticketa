@@ -173,41 +173,52 @@ export default function EventDetails() {
             </dl>
 
             <div className="mt-8 rounded-2xl border border-slate-200 p-5">
-              <label
-                htmlFor="tickets"
-                className="block text-sm font-medium text-slate-900"
-              >
-                Number of tickets
-              </label>
-              <input
-                id="tickets"
-                type="number"
-                min="1"
-                max={event.remainingTickets}
-                value={tickets}
-                onChange={(inputEvent) => setTickets(inputEvent.target.value)}
-                className="mt-2 w-full max-w-xs rounded-lg border border-slate-300 px-4 py-3 outline-none transition focus:border-slate-500"
-              />
-              {bookingError ? (
-                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {bookingError}
+              {Number(event.remainingTickets) === 0 ? (
+                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm font-semibold text-red-700">
+                  Sold Out
                 </div>
-              ) : null}
-              {bookingSuccess ? (
-                <div className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                  {bookingSuccess}
-                </div>
-              ) : null}
-              <button
-                type="button"
-                onClick={handleBooking}
-                disabled={
-                  bookingStatus === "submitting" || Number(event.remainingTickets) <= 0
-                }
-                className="mt-4 rounded-lg bg-slate-900 px-5 py-3 font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {bookingStatus === "submitting" ? "Booking..." : "Book Now"}
-              </button>
+              ) : (
+                <>
+                  {Number(event.remainingTickets) < 5 && (
+                    <div className="mb-3 rounded-lg bg-yellow-50 border border-yellow-200 px-4 py-3 text-sm font-medium text-yellow-800">
+                      Only {event.remainingTickets} ticket{event.remainingTickets === 1 ? "" : "s"} left!
+                    </div>
+                  )}
+                  <label
+                    htmlFor="tickets"
+                    className="block text-sm font-medium text-slate-900"
+                  >
+                    Number of tickets
+                  </label>
+                  <input
+                    id="tickets"
+                    type="number"
+                    min="1"
+                    max={event.remainingTickets}
+                    value={tickets}
+                    onChange={(inputEvent) => setTickets(inputEvent.target.value)}
+                    className="mt-2 w-full max-w-xs rounded-lg border border-slate-300 px-4 py-3 outline-none transition focus:border-slate-500"
+                  />
+                  {bookingError ? (
+                    <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {bookingError}
+                    </div>
+                  ) : null}
+                  {bookingSuccess ? (
+                    <div className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                      {bookingSuccess}
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={handleBooking}
+                    disabled={bookingStatus === "submitting"}
+                    className="mt-4 rounded-lg bg-slate-900 px-5 py-3 font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {bookingStatus === "submitting" ? "Booking..." : "Book Now"}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ) : null}

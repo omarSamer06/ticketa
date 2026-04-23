@@ -19,6 +19,19 @@ function getOrganizerLabel(event) {
   return event.organizer.name || event.organizer.email || "Unknown organizer";
 }
 
+function StatusBadge({ status }) {
+  const styles = {
+    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    approved: "bg-green-100 text-green-800 border-green-200",
+    rejected: "bg-red-100 text-red-800 border-red-200",
+  };
+  return (
+    <span className={`inline-block rounded-full border px-2 py-0.5 text-xs font-semibold capitalize ${styles[status] || "bg-slate-100 text-slate-700"}`}>
+      {status || "unknown"}
+    </span>
+  );
+}
+
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
@@ -28,6 +41,8 @@ export default function AdminDashboard() {
   const [updatingUserId, setUpdatingUserId] = useState("");
   const [deletingUserId, setDeletingUserId] = useState("");
   const [deletingEventId, setDeletingEventId] = useState("");
+  const [approvingEventId, setApprovingEventId] = useState("");
+  const [rejectingEventId, setRejectingEventId] = useState("");
 
   useEffect(() => {
     let isActive = true;
@@ -36,7 +51,7 @@ export default function AdminDashboard() {
       try {
         const [usersResponse, eventsResponse] = await Promise.all([
           api.get("/api/users"),
-          api.get("/api/events?limit=100"),
+          api.get("/api/admin/events"),
         ]);
 
         if (isActive) {
@@ -119,6 +134,42 @@ export default function AdminDashboard() {
       setError(err?.response?.data?.message || "Failed to delete event");
     } finally {
       setDeletingEventId("");
+    }
+  }
+
+  async function approveEvent(eventId) {
+    setError("");
+    setSuccess("");
+    setApprovingEventId(eventId);
+    try {
+      const response = await api.put(`/api/admin/events/${eventId}/approve`);
+      const updatedEvent = response?.data?.data?.event;
+      if (updatedEvent) {
+        setEvents((current) => current.map((e) => (e.id === eventId ? updatedEvent : e)));
+      }
+      setSuccess("Event approved.");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to approve event");
+    } finally {
+      setApprovingEventId("");
+    }
+  }
+
+  async function rejectEvent(eventId) {
+    setError("");
+    setSuccess("");
+    setRejectingEventId(eventId);
+    try {
+      const response = await api.put(`/api/admin/events/${eventId}/reject`);
+      const updatedEvent = response?.data?.data?.event;
+      if (updatedEvent) {
+        setEvents((current) => current.map((e) => (e.id === eventId ? updatedEvent : e)));
+      }
+      setSuccess("Event rejected.");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to reject event");
+    } finally {
+      setRejectingEventId("");
     }
   }
 
@@ -225,7 +276,7 @@ export default function AdminDashboard() {
                   <h2 className="text-2xl font-bold text-slate-900">
                     Events Management
                   </h2>
-                  <p className="text-slate-600">Review and delete listed events.</p>
+                  <p className="text-slate-600">Review, approve, reject, or delete events.</p>
                 </div>
                 <span className="text-sm font-medium text-slate-500">
                   {events.length} events
@@ -243,14 +294,15 @@ export default function AdminDashboard() {
                     >
                       <div className="flex h-full flex-col justify-between gap-4">
                         <div>
-                          <h3 className="text-xl font-semibold text-slate-900">
-                            {event.title}
-                          </h3>
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="text-xl font-semibold text-slate-900">
+                              {event.title}
+                            </h3>
+                            <StatusBadge status={event.status} />
+                          </div>
                           <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
                             <div>
-                              <dt className="font-medium text-slate-900">
-                                Organizer
-                              </dt>
+                              <dt className="font-medium text-slate-900">Organizer</dt>
                               <dd>{getOrganizerLabel(event)}</dd>
                             </div>
                             <div>
@@ -260,16 +312,36 @@ export default function AdminDashboard() {
                           </dl>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => deleteEvent(event.id)}
-                          disabled={deletingEventId === event.id}
-                          className="w-fit rounded-lg border border-red-200 px-4 py-2 font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {deletingEventId === event.id
-                            ? "Deleting..."
-                            : "Delete Event"}
-                        </button>
+                        <div className="flex flex-wrap gap-2">
+                          {event.status !== "approved" && (
+                            <button
+                              type="button"
+                              onClick={() => approveEvent(event.id)}
+                              disabled={approvingEventId === event.id}
+                              className="rounded-lg border border-green-200 px-3 py-2 text-sm font-medium text-green-700 transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {approvingEventId === event.id ? "Approving..." : "Approve"}
+                            </button>
+                          )}
+                          {event.status !== "rejected" && (
+                            <button
+                              type="button"
+                              onClick={() => rejectEvent(event.id)}
+                              disabled={rejectingEventId === event.id}
+                              className="rounded-lg border border-yellow-200 px-3 py-2 text-sm font-medium text-yellow-700 transition hover:bg-yellow-50 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {rejectingEventId === event.id ? "Rejecting..." : "Reject"}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => deleteEvent(event.id)}
+                            disabled={deletingEventId === event.id}
+                            className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {deletingEventId === event.id ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
                       </div>
                     </article>
                   ))}

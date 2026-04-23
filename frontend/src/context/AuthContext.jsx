@@ -14,10 +14,16 @@ export function AuthProvider({ children }) {
     setUser(nextUser);
   }
 
-  function logout() {
-    localStorage.removeItem("token");
-    setToken(null);
-    setUser(null);
+  async function logout() {
+    try {
+      await api.post("/api/auth/logout");
+    } catch {
+      // Ignore errors — always clear local state
+    } finally {
+      localStorage.removeItem("token");
+      setToken(null);
+      setUser(null);
+    }
   }
 
   function updateUser(nextUser) {

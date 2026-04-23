@@ -110,6 +110,10 @@ async function getAllEvents(req, res) {
 
     if (organizer && mongoose.isValidObjectId(organizer)) {
       filter.organizer = organizer;
+    } else {
+      // Public listing only shows approved events.
+      // When an organizer queries their own events (organizer param present), skip this filter.
+      filter.status = "approved";
     }
 
     if (date) {
@@ -259,11 +263,43 @@ async function deleteEvent(req, res) {
   }
 }
 
+async function getEventAnalytics(req, res) {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return json(res, 400, "Invalid event id", null);
+    }
+
+    const event = await Event.findById(id);
+    if (!event) {
+      return json(res, 404, "Event not found", null);
+    }
+
+    const isAdmin = req.user.role === "admin";
+    const isOwner = event.organizer && event.organizer.toString() === req.user._id.toString();
+    if (!isAdmin && !isOwner) {
+      return json(res, 403, "Forbidden", null);
+    }
+
+    const totalTickets = Number(event.totalTickets);
+    const bookedTickets = totalTickets - Number(event.remainingTickets);
+    const percentageBooked = totalTickets > 0 ? Math.round((bookedTickets / totalTickets) * 100) : 0;
+
+    return json(res, 200, "Analytics fetched", { totalTickets, bookedTickets, percentageBooked });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("getEventAnalytics error:", { message: err && err.message, stack: err && err.stack });
+    const f = formatMongooseError(err);
+    return json(res, f.status, f.message, f.data);
+  }
+}
+
 module.exports = {
   createEvent,
   getAllEvents,
   getSingleEvent,
   updateEvent,
   deleteEvent,
+  getEventAnalytics,
 };
 

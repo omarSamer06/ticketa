@@ -54,6 +54,11 @@ const eventSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "Organizer is required"],
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );
