@@ -24,46 +24,45 @@ function formatPrice(price) {
   }).format(amount);
 }
 
+const STATUS_STYLES = {
+  pending: "bg-yellow-100 text-yellow-800 border border-yellow-200",
+  approved: "bg-green-100 text-green-800 border border-green-200",
+  rejected: "bg-red-100 text-red-800 border border-red-200",
+};
+
 function StatusBadge({ status }) {
-  const styles = {
-    pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    approved: "bg-green-100 text-green-800 border-green-200",
-    rejected: "bg-red-100 text-red-800 border-red-200",
-  };
+  const label = status
+    ? status.charAt(0).toUpperCase() + status.slice(1)
+    : "Unknown";
   return (
-    <span className={`inline-block rounded-full border px-2 py-0.5 text-xs font-semibold capitalize ${styles[status] || "bg-slate-100 text-slate-700"}`}>
-      {status || "unknown"}
+    <span
+      className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[status] || "bg-slate-100 text-slate-600"}`}
+    >
+      {label}
     </span>
   );
 }
 
-function AnalyticsBar({ eventId }) {
-  const [analytics, setAnalytics] = useState(null);
-
-  useEffect(() => {
-    let isActive = true;
-    api.get(`/api/events/${eventId}/analytics`)
-      .then((res) => {
-        if (isActive) setAnalytics(res?.data?.data || null);
-      })
-      .catch(() => {});
-    return () => { isActive = false; };
-  }, [eventId]);
-
-  if (!analytics) return null;
-
-  const { bookedTickets, totalTickets, percentageBooked } = analytics;
-
+function AnalyticsBar({ analytics }) {
+  if (!analytics) {
+    return (
+      <p className="mt-1 text-xs text-slate-400">Loading analytics...</p>
+    );
+  }
+  const { totalTickets, bookedTickets, percentageBooked } = analytics;
   return (
     <div className="mt-3">
-      <p className="text-sm text-slate-600">
-        Booked: <span className="font-semibold text-slate-900">{bookedTickets} / {totalTickets}</span>
-        <span className="ml-2 text-slate-500">({percentageBooked}%)</span>
+      <p className="text-xs text-slate-600">
+        Booked:{" "}
+        <span className="font-semibold text-slate-800">
+          {bookedTickets} / {totalTickets}
+        </span>{" "}
+        &mdash; {percentageBooked}%
       </p>
       <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200">
         <div
-          className="h-full rounded-full bg-slate-800 transition-all"
-          style={{ width: `${percentageBooked}%` }}
+          className="h-full rounded-full bg-slate-700 transition-all"
+          style={{ width: `${Math.min(percentageBooked, 100)}%` }}
         />
       </div>
     </div>
@@ -77,19 +76,33 @@ export default function MyEvents() {
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
   const [deleteId, setDeleteId] = useState("");
+  const [analyticsMap, setAnalyticsMap] = useState({});
 
   useEffect(() => {
     let isActive = true;
 
     async function fetchEvents() {
       try {
-        const response = await api.get(`/api/events?organizer=${user?.id}&limit=100`);
+        const response = await api.get("/api/events/mine?limit=100");
         const organizerEvents = response?.data?.data || [];
 
         if (isActive) {
           setEvents(organizerEvents);
           setStatus("success");
         }
+
+        // Fetch analytics for each event in the background
+        organizerEvents.forEach(async (event) => {
+          try {
+            const analyticsResponse = await api.get(`/api/events/${event.id}/analytics`);
+            const data = analyticsResponse?.data?.data;
+            if (isActive && data) {
+              setAnalyticsMap((prev) => ({ ...prev, [event.id]: data }));
+            }
+          } catch {
+            // Analytics fetch failure is non-critical
+          }
+        });
       } catch (err) {
         if (isActive) {
           setError(err?.response?.data?.message || "Failed to load your events");
@@ -186,7 +199,7 @@ export default function MyEvents() {
               <article key={event.id} className="rounded-2xl bg-white p-6 shadow-sm">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-xl font-semibold text-slate-900">
                         {event.title}
                       </h2>
@@ -210,7 +223,7 @@ export default function MyEvents() {
                         <dd>{event.remainingTickets}</dd>
                       </div>
                     </dl>
-                    <AnalyticsBar eventId={event.id} />
+                    <AnalyticsBar analytics={analyticsMap[event.id]} />
                   </div>
 
                   <div className="flex gap-3">

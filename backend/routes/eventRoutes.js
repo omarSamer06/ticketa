@@ -7,6 +7,7 @@ const {
   getSingleEvent,
   updateEvent,
   deleteEvent,
+  getMyEvents,
   getEventAnalytics,
 } = require("../controllers/eventController");
 
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.post("/", authMiddleware, authorizeRoles("organizer"), createEvent);
 router.get("/", getAllEvents);
+router.get("/mine", authMiddleware, authorizeRoles("organizer", "admin"), getMyEvents);
 router.get("/:id/analytics", authMiddleware, authorizeRoles("organizer", "admin"), getEventAnalytics);
 router.get("/:id", getSingleEvent);
 router.put("/:id", authMiddleware, updateEvent);

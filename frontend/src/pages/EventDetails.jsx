@@ -174,16 +174,16 @@ export default function EventDetails() {
 
             <div className="mt-8 rounded-2xl border border-slate-200 p-5">
               {Number(event.remainingTickets) === 0 ? (
-                <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm font-semibold text-red-700">
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
                   Sold Out
                 </div>
               ) : (
                 <>
-                  {Number(event.remainingTickets) < 5 && (
-                    <div className="mb-3 rounded-lg bg-yellow-50 border border-yellow-200 px-4 py-3 text-sm font-medium text-yellow-800">
-                      Only {event.remainingTickets} ticket{event.remainingTickets === 1 ? "" : "s"} left!
+                  {Number(event.remainingTickets) < 5 ? (
+                    <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm font-medium text-yellow-800">
+                      Only {event.remainingTickets} ticket{Number(event.remainingTickets) === 1 ? "" : "s"} left!
                     </div>
-                  )}
+                  ) : null}
                   <label
                     htmlFor="tickets"
                     className="block text-sm font-medium text-slate-900"

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Event = require("../models/Event");
+const Booking = require("../models/Booking");
 
 function json(res, status, message, data = null) {
   return res.status(status).json({ success: status < 400, message, data });
@@ -94,7 +95,7 @@ async function getAllEvents(req, res) {
     const page = Math.max(Math.floor(Number(req.query.page)) || 1, 1);
     const limit = Math.max(Math.floor(Number(req.query.limit)) || 10, 1);
     const skip = (page - 1) * limit;
-    const filter = {};
+    const filter = { status: "approved" };
 
     if (search) {
       filter.title = { $regex: escapeRegex(search), $options: "i" };
@@ -110,10 +111,6 @@ async function getAllEvents(req, res) {
 
     if (organizer && mongoose.isValidObjectId(organizer)) {
       filter.organizer = organizer;
-    } else {
-      // Public listing only shows approved events.
-      // When an organizer queries their own events (organizer param present), skip this filter.
-      filter.status = "approved";
     }
 
     if (date) {
@@ -263,6 +260,33 @@ async function deleteEvent(req, res) {
   }
 }
 
+async function getMyEvents(req, res) {
+  try {
+    const organizer = req.user._id;
+    const page = Math.max(Math.floor(Number(req.query.page)) || 1, 1);
+    const limit = Math.max(Math.floor(Number(req.query.limit)) || 100, 1);
+    const skip = (page - 1) * limit;
+
+    const [events, total] = await Promise.all([
+      Event.find({ organizer }).sort({ date: 1 }).skip(skip).limit(limit),
+      Event.countDocuments({ organizer }),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      total,
+      page,
+      pages: Math.ceil(total / limit) || 1,
+      data: events,
+    });
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("getMyEvents error:", { message: err && err.message });
+    const f = formatMongooseError(err);
+    return json(res, f.status, f.message, f.data);
+  }
+}
+
 async function getEventAnalytics(req, res) {
   try {
     const { id } = req.params;
@@ -275,20 +299,20 @@ async function getEventAnalytics(req, res) {
       return json(res, 404, "Event not found", null);
     }
 
-    const isAdmin = req.user.role === "admin";
-    const isOwner = event.organizer && event.organizer.toString() === req.user._id.toString();
-    if (!isAdmin && !isOwner) {
-      return json(res, 403, "Forbidden", null);
-    }
+    const bookings = await Booking.find({ event: id, status: { $ne: "canceled" } });
+    const bookedTickets = bookings.reduce((sum, b) => sum + (b.numberOfTickets || 0), 0);
+    const totalTickets = event.totalTickets;
+    const percentageBooked =
+      totalTickets > 0 ? Math.round((bookedTickets / totalTickets) * 100) : 0;
 
-    const totalTickets = Number(event.totalTickets);
-    const bookedTickets = totalTickets - Number(event.remainingTickets);
-    const percentageBooked = totalTickets > 0 ? Math.round((bookedTickets / totalTickets) * 100) : 0;
-
-    return json(res, 200, "Analytics fetched", { totalTickets, bookedTickets, percentageBooked });
+    return json(res, 200, "Analytics fetched", {
+      totalTickets,
+      bookedTickets,
+      percentageBooked,
+    });
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("getEventAnalytics error:", { message: err && err.message, stack: err && err.stack });
+    console.error("getEventAnalytics error:", { message: err && err.message });
     const f = formatMongooseError(err);
     return json(res, f.status, f.message, f.data);
   }
@@ -300,6 +324,7 @@ module.exports = {
   getSingleEvent,
   updateEvent,
   deleteEvent,
+  getMyEvents,
   getEventAnalytics,
 };
 

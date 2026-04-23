@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import api from "../services/api";
 
 function NavItem({ to, children }) {
   return (
@@ -23,7 +24,12 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
 
-  function handleLogout() {
+  async function handleLogout() {
+    try {
+      await api.post("/api/auth/logout");
+    } catch {
+      // Logout endpoint failure should not block client-side logout
+    }
     logout();
     navigate("/login", { replace: true });
   }
