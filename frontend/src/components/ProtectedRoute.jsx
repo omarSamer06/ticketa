@@ -11,8 +11,11 @@ export default function ProtectedRoute({ roles }) {
 
   if (isLoadingUser) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4 text-slate-600">
-        Loading...
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+          <p className="mt-3 text-sm text-gray-500">Loading…</p>
+        </div>
       </div>
     );
   }
@@ -22,24 +25,31 @@ export default function ProtectedRoute({ roles }) {
     const article = /^[aeiou]/i.test(requiredRoles) ? "an" : "a";
 
     return (
-      <>
+      <div className="flex min-h-screen bg-gray-50">
         <Navbar />
-        <div className="min-h-screen bg-slate-100 px-4 py-8">
-          <div className="mx-auto max-w-3xl rounded-2xl bg-white p-8 text-center shadow-sm">
-            <h1 className="text-2xl font-bold text-slate-900">Access denied</h1>
-            <p className="mt-2 text-slate-600">
-              You need {article} {requiredRoles} account to access this page.
+        <main className="flex flex-1 items-center justify-center pt-14 lg:ml-64 lg:pt-0">
+          <div className="mx-auto max-w-md rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-2xl">
+              🔒
+            </div>
+            <h1 className="mt-5 text-xl font-semibold text-gray-900">Access Denied</h1>
+            <p className="mt-2 text-sm text-gray-500">
+              You need {article}{" "}
+              <span className="font-medium text-gray-700">{requiredRoles}</span>{" "}
+              account to view this page.
             </p>
           </div>
-        </div>
-      </>
+        </main>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="flex min-h-screen bg-gray-50">
       <Navbar />
-      <Outlet />
-    </>
+      <main className="flex-1 pt-14 lg:ml-64 lg:pt-0">
+        <Outlet />
+      </main>
+    </div>
   );
 }

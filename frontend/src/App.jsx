@@ -25,13 +25,7 @@ export default function App() {
       <Route element={<ProtectedRoute roles={["organizer"]} />}>
         <Route
           path="/create-event"
-          element={
-            <div className="min-h-screen bg-slate-100 px-4 py-8">
-              <div className="mx-auto max-w-3xl">
-                <CreateEvent />
-              </div>
-            </div>
-          }
+          element={<CreateEvent />}
         />
         <Route path="/my-events" element={<MyEvents />} />
       </Route>

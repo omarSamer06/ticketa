@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const sendEmail = require("../utils/sendEmail");
 
 function generateToken(userId) {
   const secret = process.env.JWT_SECRET;
@@ -95,6 +96,16 @@ async function register(req, res) {
 
     const user = await User.create({ name, email, password });
     const token = generateToken(user._id.toString());
+
+    // Send welcome email — failure must not block registration
+    sendEmail({
+      to: user.email,
+      subject: "Welcome to Event Platform",
+      text: "Your account has been created successfully. You can now log in and start using the platform.",
+    }).catch((emailErr) => {
+      // eslint-disable-next-line no-console
+      console.error("Welcome email failed (non-fatal):", emailErr && emailErr.message);
+    });
 
     return jsonResponse(res, 201, {
       success: true,

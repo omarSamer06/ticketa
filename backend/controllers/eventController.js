@@ -299,11 +299,11 @@ async function getEventAnalytics(req, res) {
       return json(res, 404, "Event not found", null);
     }
 
-    const bookings = await Booking.find({ event: id, status: { $ne: "canceled" } });
+    const bookings = await Booking.find({ event: id, status: "confirmed" });
     const bookedTickets = bookings.reduce((sum, b) => sum + (b.numberOfTickets || 0), 0);
     const totalTickets = event.totalTickets;
     const percentageBooked =
-      totalTickets > 0 ? Math.round((bookedTickets / totalTickets) * 100) : 0;
+      totalTickets > 0 ? parseFloat(((bookedTickets / totalTickets) * 100).toFixed(1)) : 0;
 
     return json(res, 200, "Analytics fetched", {
       totalTickets,

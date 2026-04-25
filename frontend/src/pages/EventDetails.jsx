@@ -4,7 +4,6 @@ import api from "../services/api";
 
 function formatDate(date) {
   if (!date) return "Date unavailable";
-
   return new Intl.DateTimeFormat("en", {
     dateStyle: "full",
     timeStyle: "short",
@@ -13,14 +12,9 @@ function formatDate(date) {
 
 function formatPrice(price) {
   const amount = Number(price);
-
   if (Number.isNaN(amount)) return "Price unavailable";
   if (amount === 0) return "Free";
-
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
+  return new Intl.NumberFormat("en", { style: "currency", currency: "USD" }).format(amount);
 }
 
 function EventImage({ image, title }) {
@@ -28,8 +22,8 @@ function EventImage({ image, title }) {
 
   if (!image || hasError) {
     return (
-      <div className="flex h-72 items-center justify-center rounded-2xl bg-slate-200 text-sm font-medium text-slate-500">
-        No image available
+      <div className="flex h-64 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 text-5xl">
+        🗓
       </div>
     );
   }
@@ -38,7 +32,7 @@ function EventImage({ image, title }) {
     <img
       src={image}
       alt={title}
-      className="h-72 w-full rounded-2xl object-cover"
+      className="h-64 w-full rounded-2xl object-cover"
       onError={() => setHasError(true)}
     />
   );
@@ -61,7 +55,6 @@ export default function EventDetails() {
       try {
         const response = await api.get(`/api/events/${id}`);
         const nextEvent = response?.data?.data?.event;
-
         if (isActive) {
           setEvent(nextEvent || null);
           setStatus(nextEvent ? "success" : "error");
@@ -76,10 +69,7 @@ export default function EventDetails() {
     }
 
     fetchEvent();
-
-    return () => {
-      isActive = false;
-    };
+    return () => { isActive = false; };
   }, [id]);
 
   async function handleBooking() {
@@ -101,10 +91,7 @@ export default function EventDetails() {
     setBookingStatus("submitting");
 
     try {
-      await api.post("/api/bookings", {
-        eventId: id,
-        numberOfTickets,
-      });
+      await api.post("/api/bookings", { eventId: id, numberOfTickets });
 
       setEvent((currentEvent) =>
         currentEvent
@@ -127,102 +114,166 @@ export default function EventDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 px-4 py-8">
-      <div className="mx-auto max-w-4xl">
-        <Link to="/events" className="text-sm font-medium text-slate-700 underline">
-          Back to events
-        </Link>
+    <div className="p-6">
+      <Link
+        to="/events"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+      >
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to events
+      </Link>
 
-        {status === "loading" ? (
-          <div className="mt-6 rounded-2xl bg-white p-6 text-slate-600 shadow-sm">
-            Loading event details...
-          </div>
-        ) : null}
+      {/* Loading skeleton */}
+      {status === "loading" ? (
+        <div className="mt-6 animate-pulse rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+          <div className="h-64 rounded-2xl bg-gray-100" />
+          <div className="mt-6 h-6 w-2/3 rounded bg-gray-100" />
+          <div className="mt-2 h-4 w-full rounded bg-gray-100" />
+          <div className="mt-1 h-4 w-3/4 rounded bg-gray-100" />
+        </div>
+      ) : null}
 
-        {status === "error" ? (
-          <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700">
-            {error}
-          </div>
-        ) : null}
+      {/* Error */}
+      {status === "error" ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      ) : null}
 
-        {status === "success" && event ? (
-          <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-            <EventImage image={event.image} title={event.title} />
-            <div className="mt-6 border-b border-slate-200 pb-6">
-              <h1 className="text-3xl font-bold text-slate-900">{event.title}</h1>
-              <p className="mt-3 text-slate-600">{event.description}</p>
+      {/* Content */}
+      {status === "success" && event ? (
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+          {/* Main column */}
+          <div className="lg:col-span-2">
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <EventImage image={event.image} title={event.title} />
+              <h1 className="mt-6 text-2xl font-semibold text-gray-900">{event.title}</h1>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600">{event.description}</p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {[
+                  {
+                    label: "Date & Time",
+                    value: formatDate(event.date),
+                    icon: (
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    label: "Location",
+                    value: event.location,
+                    icon: (
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    label: "Price",
+                    value: formatPrice(event.price),
+                    icon: (
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    label: "Remaining Tickets",
+                    value: event.remainingTickets,
+                    icon: (
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                      </svg>
+                    ),
+                  },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-3 rounded-xl bg-gray-50 p-4">
+                    <span className="mt-0.5 text-blue-500">{item.icon}</span>
+                    <div>
+                      <p className="text-xs font-medium text-gray-400">{item.label}</p>
+                      <p className="mt-0.5 text-sm font-medium text-gray-800">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
 
-            <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
-              <div className="rounded-xl bg-slate-50 p-4">
-                <dt className="font-medium text-slate-900">Date</dt>
-                <dd className="mt-1 text-slate-600">{formatDate(event.date)}</dd>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-4">
-                <dt className="font-medium text-slate-900">Location</dt>
-                <dd className="mt-1 text-slate-600">{event.location}</dd>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-4">
-                <dt className="font-medium text-slate-900">Price</dt>
-                <dd className="mt-1 text-slate-600">{formatPrice(event.price)}</dd>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-4">
-                <dt className="font-medium text-slate-900">Remaining Tickets</dt>
-                <dd className="mt-1 text-slate-600">{event.remainingTickets}</dd>
-              </div>
-            </dl>
+          {/* Booking sidebar */}
+          <div>
+            <div className="sticky top-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <h2 className="text-base font-semibold text-gray-900">Reserve tickets</h2>
 
-            <div className="mt-8 rounded-2xl border border-slate-200 p-5">
               {Number(event.remainingTickets) === 0 ? (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-                  Sold Out
+                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center">
+                  <p className="text-sm font-semibold text-red-600">Sold Out</p>
+                  <p className="mt-1 text-xs text-red-400">No tickets available</p>
                 </div>
               ) : (
                 <>
                   {Number(event.remainingTickets) < 5 ? (
-                    <div className="mb-4 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm font-medium text-yellow-800">
-                      Only {event.remainingTickets} ticket{Number(event.remainingTickets) === 1 ? "" : "s"} left!
+                    <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-medium text-orange-700">
+                      ⚡ Only {event.remainingTickets} ticket{Number(event.remainingTickets) === 1 ? "" : "s"} left!
                     </div>
                   ) : null}
-                  <label
-                    htmlFor="tickets"
-                    className="block text-sm font-medium text-slate-900"
-                  >
-                    Number of tickets
-                  </label>
-                  <input
-                    id="tickets"
-                    type="number"
-                    min="1"
-                    max={event.remainingTickets}
-                    value={tickets}
-                    onChange={(inputEvent) => setTickets(inputEvent.target.value)}
-                    className="mt-2 w-full max-w-xs rounded-lg border border-slate-300 px-4 py-3 outline-none transition focus:border-slate-500"
-                  />
+
+                  <div className="mt-4">
+                    <label htmlFor="tickets" className="mb-1.5 block text-xs font-medium text-gray-500">
+                      Number of tickets
+                    </label>
+                    <input
+                      id="tickets"
+                      type="number"
+                      min="1"
+                      max={event.remainingTickets}
+                      value={tickets}
+                      onChange={(e) => setTickets(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
+                    />
+                  </div>
+
                   {bookingError ? (
-                    <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
                       {bookingError}
                     </div>
                   ) : null}
                   {bookingSuccess ? (
-                    <div className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                    <div className="mt-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700">
                       {bookingSuccess}
                     </div>
                   ) : null}
+
                   <button
                     type="button"
                     onClick={handleBooking}
                     disabled={bookingStatus === "submitting"}
-                    className="mt-4 rounded-lg bg-slate-900 px-5 py-3 font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
                   >
-                    {bookingStatus === "submitting" ? "Booking..." : "Book Now"}
+                    {bookingStatus === "submitting" ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Booking…
+                      </span>
+                    ) : "Book Now"}
                   </button>
+
+                  <p className="mt-3 text-center text-xs text-gray-400">
+                    {formatPrice(event.price)} per ticket
+                  </p>
                 </>
               )}
             </div>
           </div>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }
