@@ -11,7 +11,7 @@ export default function ProtectedRoute({ roles }) {
 
   if (isLoadingUser) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 via-indigo-50 to-violet-100">
         <div className="text-center">
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
           <p className="mt-3 text-sm text-gray-500">Loading…</p>
@@ -25,10 +25,10 @@ export default function ProtectedRoute({ roles }) {
     const article = /^[aeiou]/i.test(requiredRoles) ? "an" : "a";
 
     return (
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-gradient-to-br from-blue-100 via-indigo-50 to-violet-100">
         <Navbar />
         <main className="flex flex-1 items-center justify-center pt-14 lg:ml-64 lg:pt-0">
-          <div className="mx-auto max-w-md rounded-2xl border border-gray-100 bg-white p-10 text-center shadow-sm">
+          <div className="mx-auto max-w-md rounded-2xl border border-white/40 bg-white/80 p-10 text-center shadow-md backdrop-blur">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-2xl">
               🔒
             </div>
@@ -45,7 +45,7 @@ export default function ProtectedRoute({ roles }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-blue-100 via-indigo-50 to-violet-100">
       <Navbar />
       <main className="flex-1 pt-14 lg:ml-64 lg:pt-0">
         <Outlet />

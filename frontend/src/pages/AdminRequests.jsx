@@ -62,7 +62,7 @@ export default function AdminRequests() {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Organizer Requests</h1>
+        <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">Organizer Requests</h1>
         <p className="mt-1 text-sm text-gray-500">Review and action pending organizer applications.</p>
       </div>
 
@@ -129,7 +129,7 @@ export default function AdminRequests() {
                     type="button"
                     onClick={() => approveUser(user.id)}
                     disabled={approvingId === user.id || rejectingId === user.id}
-                    className="rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {approvingId === user.id ? "Approving…" : "Approve"}
                   </button>

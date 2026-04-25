@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminRequests from "./pages/AdminRequests";
+import ApplyOrganizer from "./pages/ApplyOrganizer";
 import CreateEvent from "./pages/CreateEvent";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EventDetails from "./pages/EventDetails";
@@ -8,6 +9,7 @@ import Events from "./pages/Events";
 import Login from "./pages/Login";
 import MyBookings from "./pages/MyBookings";
 import MyEvents from "./pages/MyEvents";
+import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 
 export default function App() {
@@ -20,6 +22,8 @@ export default function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventDetails />} />
         <Route path="/my-bookings" element={<MyBookings />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/apply-organizer" element={<ApplyOrganizer />} />
       </Route>
 
       <Route element={<ProtectedRoute roles={["organizer"]} />}>

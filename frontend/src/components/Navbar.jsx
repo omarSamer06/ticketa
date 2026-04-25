@@ -9,10 +9,10 @@ function SidebarLink({ to, children }) {
       to={to}
       className={({ isActive }) =>
         [
-          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150",
+          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150",
           isActive
-            ? "bg-blue-50 text-blue-600"
-            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+            ? "bg-gradient-to-r from-blue-500/25 to-indigo-500/15 text-white font-semibold shadow-sm ring-1 ring-white/10"
+            : "text-slate-400 hover:bg-white/8 hover:text-white",
         ].join(" ")
       }
     >
@@ -23,7 +23,7 @@ function SidebarLink({ to, children }) {
 
 function SectionLabel({ children }) {
   return (
-    <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+    <p className="mb-1 mt-5 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
       {children}
     </p>
   );
@@ -47,11 +47,11 @@ export default function Navbar() {
   const sidebar = (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-gray-100 px-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-base text-white">
+      <div className="flex h-16 shrink-0 items-center gap-2.5 border-b border-white/10 px-5">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-base text-white shadow-md">
           🎟
         </div>
-        <span className="text-base font-semibold text-gray-900">Ticketing</span>
+        <span className="text-base font-bold text-white tracking-tight">Ticketing</span>
       </div>
 
       {/* Navigation */}
@@ -69,6 +69,21 @@ export default function Navbar() {
           </svg>
           My Bookings
         </SidebarLink>
+        <SidebarLink to="/profile">
+          <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          Profile
+        </SidebarLink>
+
+        {user?.role === "user" ? (
+          <SidebarLink to="/apply-organizer">
+            <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+            Become Organizer
+          </SidebarLink>
+        ) : null}
 
         {user?.role === "organizer" ? (
           <>
@@ -109,22 +124,28 @@ export default function Navbar() {
       </nav>
 
       {/* User footer */}
-      <div className="shrink-0 border-t border-gray-100 p-4">
+      <div className="shrink-0 border-t border-white/10 p-4">
         {user ? (
           <div className="mb-3 flex items-center gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
-              {user.name?.charAt(0)?.toUpperCase() || "U"}
+            {/* Gradient ring avatar */}
+            <div className="relative shrink-0">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 blur-[2px] opacity-70" />
+              <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 text-sm font-bold text-white shadow">
+                {user.name?.charAt(0)?.toUpperCase() || "U"}
+              </div>
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="truncate text-xs text-gray-500 capitalize">{user.role}</p>
+              <p className="truncate text-sm font-semibold text-white">{user.name}</p>
+              <span className="inline-flex items-center rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-semibold capitalize text-blue-300">
+                {user.role}
+              </span>
             </div>
           </div>
         ) : null}
         <button
           type="button"
           onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-sm font-medium text-slate-300 transition-all duration-150 hover:bg-red-500/20 hover:text-red-300"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -138,24 +159,24 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop sidebar — fixed */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-gray-200 bg-white shadow-sm lg:flex lg:flex-col">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 shadow-xl lg:flex lg:flex-col">
         {sidebar}
       </aside>
 
       {/* Mobile top bar */}
-      <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-gray-200 bg-white px-4 lg:hidden">
+      <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-white/10 bg-slate-900 px-4 lg:hidden">
         <button
           type="button"
           aria-label="Open navigation"
           onClick={() => setMobileOpen(true)}
-          className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100"
+          className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white"
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <Link to="/events" className="flex items-center gap-2 font-semibold text-gray-900">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-blue-600 text-xs text-white">🎟</div>
+        <Link to="/events" className="flex items-center gap-2 font-bold text-white">
+          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-indigo-500 text-xs text-white shadow-sm">🎟</div>
           Ticketing
         </Link>
       </header>
@@ -167,12 +188,12 @@ export default function Navbar() {
             className="fixed inset-0 z-40 bg-gray-900/40 lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="fixed inset-y-0 left-0 z-50 w-64 border-r border-gray-200 bg-white shadow-xl lg:hidden">
+          <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-800 shadow-2xl lg:hidden">
             <div className="absolute right-3 top-3">
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

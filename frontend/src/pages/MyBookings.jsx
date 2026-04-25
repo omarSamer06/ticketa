@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
 import api from "../services/api";
 
 function formatPrice(price) {
@@ -29,28 +28,11 @@ function BookingStatusBadge({ status }) {
   );
 }
 
-function RequestStatusBadge({ status }) {
-  const map = {
-    approved: "bg-green-100 text-green-700",
-    rejected: "bg-red-100 text-red-700",
-    pending: "bg-yellow-100 text-yellow-700",
-  };
-  return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${map[status] || "bg-gray-100 text-gray-600"}`}>
-      {status}
-    </span>
-  );
-}
-
 export default function MyBookings() {
-  const { updateUser, user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
   const [cancelingId, setCancelingId] = useState("");
-  const [organizerRequestStatus, setOrganizerRequestStatus] = useState("idle");
-  const [organizerMessage, setOrganizerMessage] = useState("");
-  const [organizerReason, setOrganizerReason] = useState("");
 
   const dashboardStats = bookings.reduce(
     (stats, booking) => {
@@ -112,40 +94,17 @@ export default function MyBookings() {
     }
   }
 
-  async function requestOrganizer() {
-    setOrganizerMessage("");
-    if (!organizerReason.trim()) {
-      setOrganizerMessage("Please explain why you want to be an organizer.");
-      return;
-    }
-    setOrganizerRequestStatus("submitting");
-    try {
-      const response = await api.post("/api/users/request-organizer", { reason: organizerReason });
-      const updatedUser = response?.data?.data?.user;
-      if (updatedUser) updateUser(updatedUser);
-      setOrganizerMessage("Request sent. Awaiting approval.");
-      setOrganizerReason("");
-    } catch (err) {
-      setOrganizerMessage(err?.response?.data?.message || "Failed to send organizer request");
-    } finally {
-      setOrganizerRequestStatus("idle");
-    }
-  }
-
-  const requestStatus = user?.organizerRequestStatus || "none";
-  const canRequestOrganizer = user?.role === "user" && ["none", "rejected"].includes(requestStatus);
-
   return (
     <div className="p-6">
       {/* Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">My Bookings</h1>
+          <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">My Bookings</h1>
           <p className="mt-1 text-sm text-gray-500">Track your tickets and spending.</p>
         </div>
         <Link
           to="/events"
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-95"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -158,68 +117,20 @@ export default function MyBookings() {
       {status === "success" ? (
         <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[
-            { label: "Total Bookings", value: dashboardStats.totalBookings, color: "text-gray-900" },
-            { label: "Tickets Booked", value: dashboardStats.totalTickets, color: "text-gray-900" },
-            { label: "Money Spent", value: formatPrice(dashboardStats.totalSpent), color: "text-blue-600" },
-            { label: "Active", value: dashboardStats.activeBookings, color: "text-green-600" },
-            { label: "Canceled", value: dashboardStats.canceledBookings, color: "text-red-500" },
+            { label: "Total Bookings", value: dashboardStats.totalBookings, icon: "📋", iconBg: "bg-blue-100", numColor: "text-blue-700" },
+            { label: "Tickets Booked", value: dashboardStats.totalTickets, icon: "🎫", iconBg: "bg-indigo-100", numColor: "text-indigo-700" },
+            { label: "Money Spent", value: formatPrice(dashboardStats.totalSpent), icon: "💸", iconBg: "bg-violet-100", numColor: "text-violet-700" },
+            { label: "Active", value: dashboardStats.activeBookings, icon: "✅", iconBg: "bg-green-100", numColor: "text-green-700" },
+            { label: "Canceled", value: dashboardStats.canceledBookings, icon: "❌", iconBg: "bg-red-100", numColor: "text-red-600" },
           ].map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+            <div key={stat.label} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+              <div className={`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl text-lg ${stat.iconBg}`}>
+                {stat.icon}
+              </div>
               <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{stat.label}</p>
-              <p className={`mt-2 text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+              <p className={`mt-1 text-2xl font-bold ${stat.numColor}`}>{stat.value}</p>
             </div>
           ))}
-        </div>
-      ) : null}
-
-      {/* Organizer request panel */}
-      {user?.role === "user" ? (
-        <div className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h2 className="text-sm font-semibold text-gray-900">Become an Organizer</h2>
-              <p className="mt-1 text-xs text-gray-500">Apply to publish and manage your own events.</p>
-            </div>
-            <RequestStatusBadge status={requestStatus} />
-          </div>
-
-          {canRequestOrganizer ? (
-            <div className="mt-4">
-              <label htmlFor="organizerReason" className="mb-1.5 block text-xs font-medium text-gray-500">
-                Why do you want to be an organizer?
-              </label>
-              <textarea
-                id="organizerReason"
-                value={organizerReason}
-                onChange={(e) => setOrganizerReason(e.target.value)}
-                className="min-h-24 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
-                placeholder="Share your event plans or experience."
-              />
-              <button
-                type="button"
-                onClick={requestOrganizer}
-                disabled={organizerRequestStatus === "submitting"}
-                className="mt-3 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {organizerRequestStatus === "submitting" ? "Sending…" : "Submit Request"}
-              </button>
-            </div>
-          ) : (
-            <p className="mt-3 text-xs text-gray-500">
-              {requestStatus === "pending"
-                ? "Your request is pending admin review."
-                : requestStatus === "approved"
-                  ? "Your organizer request has been approved."
-                  : "Organizer requests are unavailable for your account."}
-            </p>
-          )}
-        </div>
-      ) : null}
-
-      {/* Feedback messages */}
-      {organizerMessage ? (
-        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-          {organizerMessage}
         </div>
       ) : null}
 
@@ -249,6 +160,12 @@ export default function MyBookings() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-3xl">🎫</div>
           <p className="mt-4 text-base font-medium text-gray-900">No bookings yet</p>
           <p className="mt-1 text-sm text-gray-500">Browse events and book your first ticket.</p>
+          <Link
+            to="/events"
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95"
+          >
+            Browse Events
+          </Link>
         </div>
       ) : null}
 
@@ -260,10 +177,10 @@ export default function MyBookings() {
             {bookings.map((booking) => (
               <article
                 key={booking.id}
-                className={`rounded-2xl border-l-4 bg-white shadow-sm ${
-                  booking.status === "canceled" ? "border-l-red-400" : "border-l-green-500"
-                }`}
+                className="overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               >
+                {/* Colored top stripe */}
+                <div className={`h-1.5 w-full ${booking.status === "canceled" ? "bg-gradient-to-r from-red-400 to-red-500" : "bg-gradient-to-r from-green-400 to-emerald-500"}`} />
                 <div className="flex h-full flex-col justify-between gap-4 p-5">
                   <div>
                     <div className="flex flex-wrap items-start justify-between gap-2">

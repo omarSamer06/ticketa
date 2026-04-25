@@ -149,7 +149,7 @@ export default function EventDetails() {
           <div className="lg:col-span-2">
             <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
               <EventImage image={event.image} title={event.title} />
-              <h1 className="mt-6 text-2xl font-semibold text-gray-900">{event.title}</h1>
+              <h1 className="mt-6 text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">{event.title}</h1>
               <p className="mt-3 text-sm leading-relaxed text-gray-600">{event.description}</p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -252,7 +252,7 @@ export default function EventDetails() {
                     type="button"
                     onClick={handleBooking}
                     disabled={bookingStatus === "submitting"}
-                    className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="mt-4 w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-4 py-3 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
                   >
                     {bookingStatus === "submitting" ? (
                       <span className="flex items-center justify-center gap-2">

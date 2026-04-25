@@ -124,9 +124,20 @@ export default function MyEvents() {
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">My Events</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage the events you have created as an organizer.</p>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">My Events</h1>
+          <p className="mt-1 text-sm text-gray-500">Manage the events you have created as an organizer.</p>
+        </div>
+        <a
+          href="/create-event"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-95"
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Create Event
+        </a>
       </div>
 
       {error ? (
@@ -165,9 +176,18 @@ export default function MyEvents() {
       {/* Empty state */}
       {status === "success" && events.length === 0 ? (
         <div className="mt-16 flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-3xl">📋</div>
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-3xl">📋</div>
           <p className="mt-4 text-base font-medium text-gray-900">No events yet</p>
           <p className="mt-1 text-sm text-gray-500">Create your first event to get started.</p>
+          <a
+            href="/create-event"
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Create your first event
+          </a>
         </div>
       ) : null}
 

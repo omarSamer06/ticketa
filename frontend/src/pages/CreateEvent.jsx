@@ -197,7 +197,7 @@ export default function CreateEvent({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+            className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isSubmitting ? (
               <span className="flex items-center gap-2">
@@ -228,7 +228,7 @@ export default function CreateEvent({
     return (
       <div className="p-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Create Event</h1>
+          <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">Create Event</h1>
           <p className="mt-1 text-sm text-gray-500">Publish a new event for attendees to discover and book.</p>
         </div>
         <div className="max-w-2xl">

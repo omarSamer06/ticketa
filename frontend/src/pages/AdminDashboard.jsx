@@ -147,7 +147,7 @@ export default function AdminDashboard() {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Admin Dashboard</h1>
+        <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">Admin Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500">Manage users, roles, and events from one place.</p>
       </div>
 
@@ -180,17 +180,24 @@ export default function AdminDashboard() {
           {/* Users table */}
           <section className="rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <div>
-                <h2 className="text-base font-semibold text-gray-900">Users</h2>
-                <p className="text-xs text-gray-500">Update roles or remove users.</p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-base text-white shadow-sm">
+                  👥
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-gray-900">Users</h2>
+                  <p className="text-xs text-gray-500">Update roles or remove users.</p>
+                </div>
               </div>
-              <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+              <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
                 {users.length}
               </span>
             </div>
 
             {users.length === 0 ? (
-              <div className="py-12 text-center text-sm text-gray-400">No users found.</div>
+              <div className="py-12 text-center">
+                <p className="text-sm font-medium text-gray-500">No users found</p>
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
@@ -240,17 +247,25 @@ export default function AdminDashboard() {
           {/* Events section */}
           <section className="rounded-2xl border border-gray-100 bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <div>
-                <h2 className="text-base font-semibold text-gray-900">Events</h2>
-                <p className="text-xs text-gray-500">Approve, reject, or delete events.</p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-base text-white shadow-sm">
+                  🎟
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-gray-900">Events</h2>
+                  <p className="text-xs text-gray-500">Approve, reject, or delete events.</p>
+                </div>
               </div>
-              <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
                 {events.length}
               </span>
             </div>
 
             {events.length === 0 ? (
-              <div className="py-12 text-center text-sm text-gray-400">No events found.</div>
+              <div className="py-12 text-center">
+                <p className="text-sm font-medium text-gray-500">No events to review</p>
+                <p className="mt-1 text-xs text-gray-400">Events submitted by organizers will appear here.</p>
+              </div>
             ) : (
               <div className="grid gap-4 p-6 lg:grid-cols-2">
                 {events.map((event) => (
