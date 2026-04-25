@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../context/useAuth";
 
 function formatPrice(price) {
   const amount = Number(price);
@@ -29,6 +30,7 @@ function BookingStatusBadge({ status }) {
 }
 
 export default function MyBookings() {
+  const { user } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
@@ -96,39 +98,52 @@ export default function MyBookings() {
 
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">My Bookings</h1>
-          <p className="mt-1 text-sm text-gray-500">Track your tickets and spending.</p>
+      {/* Welcome hero */}
+      <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 p-7 text-white shadow-xl">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/2 h-32 w-32 translate-y-1/2 rounded-full bg-violet-300/20 blur-2xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-blue-200">📅 Dashboard</p>
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              Welcome back, {user?.name?.split(" ")[0] || "there"} 👋
+            </h1>
+            <p className="mt-1.5 max-w-sm text-sm text-blue-100">
+              Track your bookings, spending, and upcoming events — all in one place.
+            </p>
+          </div>
+          <Link
+            to="/events"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-blue-600 shadow-md transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+            </svg>
+            Browse Events
+          </Link>
         </div>
-        <Link
-          to="/events"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-95"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Browse Events
-        </Link>
       </div>
 
       {/* Stats */}
       {status === "success" ? (
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {[
-            { label: "Total Bookings", value: dashboardStats.totalBookings, icon: "📋", iconBg: "bg-blue-100", numColor: "text-blue-700" },
-            { label: "Tickets Booked", value: dashboardStats.totalTickets, icon: "🎫", iconBg: "bg-indigo-100", numColor: "text-indigo-700" },
-            { label: "Money Spent", value: formatPrice(dashboardStats.totalSpent), icon: "💸", iconBg: "bg-violet-100", numColor: "text-violet-700" },
-            { label: "Active", value: dashboardStats.activeBookings, icon: "✅", iconBg: "bg-green-100", numColor: "text-green-700" },
-            { label: "Canceled", value: dashboardStats.canceledBookings, icon: "❌", iconBg: "bg-red-100", numColor: "text-red-600" },
+            { label: "Total Bookings", value: dashboardStats.totalBookings, icon: "📋", gradient: "from-blue-500 to-blue-700" },
+            { label: "Tickets Booked", value: dashboardStats.totalTickets, icon: "🎫", gradient: "from-indigo-500 to-indigo-700" },
+            { label: "Money Spent", value: formatPrice(dashboardStats.totalSpent), icon: "💸", gradient: "from-violet-500 to-purple-700" },
+            { label: "Active", value: dashboardStats.activeBookings, icon: "✅", gradient: "from-emerald-500 to-green-700" },
+            { label: "Canceled", value: dashboardStats.canceledBookings, icon: "❌", gradient: "from-red-500 to-rose-700" },
           ].map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-              <div className={`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl text-lg ${stat.iconBg}`}>
-                {stat.icon}
+            <div
+              key={stat.label}
+              className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.gradient} p-5 text-white shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-xl`}
+            >
+              <div className="pointer-events-none absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/10 blur-xl" />
+              <div className="relative">
+                <span className="text-2xl">{stat.icon}</span>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-widest text-white/70">{stat.label}</p>
+                <p className="mt-1 text-2xl font-bold">{stat.value}</p>
               </div>
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{stat.label}</p>
-              <p className={`mt-1 text-2xl font-bold ${stat.numColor}`}>{stat.value}</p>
             </div>
           ))}
         </div>

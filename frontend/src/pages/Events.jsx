@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../context/useAuth";
 
 function formatDate(date) {
   if (!date) return "Date unavailable";
@@ -54,6 +55,7 @@ const inputClass =
   "w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20";
 
 export default function Events() {
+  const { user } = useAuth();
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
@@ -104,14 +106,30 @@ export default function Events() {
         {/* Decorative blobs */}
         <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-1/3 h-36 w-36 translate-y-1/2 rounded-full bg-violet-300/20 blur-2xl" />
-        <div className="relative">
-          <span className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
-            🎟 Live Events
-          </span>
-          <h1 className="text-3xl font-bold tracking-tight">Discover Amazing Events</h1>
-          <p className="mt-2 max-w-md text-sm text-blue-100">
-            Browse concerts, workshops, conferences and more. Book your next experience today.
-          </p>
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
+              🎟 Live Events
+            </span>
+            {user?.name ? (
+              <p className="mb-1 text-sm font-medium text-blue-200">
+                Hello, {user.name.split(" ")[0]} 👋
+              </p>
+            ) : null}
+            <h1 className="text-3xl font-bold tracking-tight">Discover Amazing Events</h1>
+            <p className="mt-2 max-w-md text-sm text-blue-100">
+              Browse concerts, workshops, conferences and more. Book your next experience today.
+            </p>
+          </div>
+          <Link
+            to="/my-bookings"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white/20 px-5 py-2.5 text-sm font-bold text-white ring-1 ring-white/30 backdrop-blur-sm transition-all duration-200 hover:bg-white/30 hover:scale-[1.02] active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2" />
+            </svg>
+            My Bookings
+          </Link>
         </div>
       </div>
 

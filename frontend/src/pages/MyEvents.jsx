@@ -123,21 +123,30 @@ export default function MyEvents() {
 
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">My Events</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage the events you have created as an organizer.</p>
+      {/* Hero */}
+      <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 p-7 text-white shadow-xl">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 translate-y-1/2 rounded-full bg-purple-300/20 blur-2xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-indigo-200">⭐ Organizer Hub</p>
+            <h1 className="text-2xl font-bold sm:text-3xl">
+              Hey {user?.name?.split(" ")[0] || "Organizer"}, here are your events
+            </h1>
+            <p className="mt-1.5 max-w-sm text-sm text-indigo-100">
+              Create, manage, and track analytics for all your events.
+            </p>
+          </div>
+          <a
+            href="/create-event"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-indigo-600 shadow-md transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-95"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Create Event
+          </a>
         </div>
-        <a
-          href="/create-event"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-95"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Create Event
-        </a>
       </div>
 
       {error ? (
