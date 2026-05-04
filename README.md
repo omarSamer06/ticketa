@@ -1,142 +1,194 @@
-# MERN Event Ticketing System
+# 🎟️ Ticketa — Event Ticketing Platform (MERN SaaS)
 
-A fullstack event ticketing application built with MongoDB, Express, React, Node.js, Vite, and Tailwind CSS. Users can register, log in, browse events, book tickets, view their bookings, and cancel bookings.
+Ticketa is a full-stack event ticketing platform that simulates a real-world SaaS product. It enables users to discover events, book tickets, and manage bookings, while organizers can create events and track performance, and admins manage approvals and users.
 
-## Features
+> 🚀 Built with production practices: role-based access, secure auth, scalable APIs, and a modern UI.
 
-- User authentication with register and login
-- JWT-protected booking routes
-- Event listing and event details
-- Organizer event creation API
-- Ticket booking with remaining-ticket validation
-- User bookings dashboard
-- Cancel booking flow
-- Responsive React UI with Tailwind CSS
-- Environment-based configuration for local and deployment use
 
-## Tech Stack
 
-- Frontend: React, Vite, Tailwind CSS, React Router, Axios
-- Backend: Node.js, Express, MongoDB, Mongoose
-- Auth: JWT, bcryptjs
-- Tooling: ESLint, npm
+---
 
-## Screenshots
+## ✨ Features
 
-Add portfolio screenshots here:
+### 👤 Authentication & Roles
+- JWT-based authentication
+- Role-based access control:
+  - **User** – browse & book events
+  - **Organizer** – create & manage events
+  - **Admin** – approve events & manage users
 
-- Login page
-- Events list
-- Event details and booking
-- My bookings dashboard
+---
 
-## Project Structure
+### 🎫 Event System
+- Browse approved events
+- Event details page (date, location, price, availability)
+- Search & filtering
 
-```text
-webapp1/
-  backend/
-    controllers/
-    middleware/
-    models/
-    routes/
-    server.js
-  frontend/
-    src/
-      components/
-      context/
-      pages/
-      services/
+---
+
+### 📅 Booking System
+- Book multiple tickets (with availability checks)
+- Real-time availability display (Sold Out / Limited tickets)
+- Booking history
+- Cancel bookings
+- Automatic price calculation
+
+---
+
+### 🧑‍💼 Organizer Features
+- Create, edit, and delete events
+- View event status (Pending / Approved / Rejected)
+- Analytics:
+  - Tickets sold
+  - Percentage booked
+
+---
+
+### 👑 Admin Dashboard
+- View all events (including pending)
+- Approve or reject events
+- Manage users (view, update roles, delete)
+
+---
+
+### 📧 Email Integration
+- Welcome email sent on registration
+- Production-safe email handling using Nodemailer
+
+---
+
+### 🎨 UI/UX
+- Modern SaaS-style dashboard
+- Sidebar navigation with role-based sections
+- Gradient hero sections & stat cards
+- Responsive design (mobile-friendly)
+- Clean, consistent Tailwind UI
+
+---
+
+## 🧱 Tech Stack
+
+### Frontend
+- React (Vite)
+- Tailwind CSS
+- Axios
+- React Router
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+
+### Other
+- JWT Authentication
+- Nodemailer (Email)
+- REST API Architecture
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/your-username/ticketa.git
+cd ticketa
 ```
 
-## Local Setup
+---
 
-### 1. Backend
-
+### 2. Backend Setup
 ```bash
 cd backend
 npm install
 ```
 
-Create `backend/.env`:
-
+Create `.env`:
 ```env
 PORT=3000
-MONGO_URI=mongodb://127.0.0.1:27017/webapp1
-JWT_SECRET=replace_with_a_long_random_secret
+MONGO_URI=your_mongodb_connection
+JWT_SECRET=your_secret_key
 CLIENT_URL=http://localhost:5173
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
 ```
 
-Start the backend:
-
+Run backend:
 ```bash
 npm run dev
 ```
 
-The API runs at `http://localhost:3000`.
+---
 
-### 2. Frontend
-
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 ```
 
-Create `frontend/.env`:
-
+Create `.env`:
 ```env
 VITE_API_URL=http://localhost:3000
 ```
 
-Start the frontend:
-
+Run frontend:
 ```bash
 npm run dev
 ```
 
-The app runs at `http://localhost:5173`.
+---
 
-## Production Notes
+## 🌍 Deployment
 
-- Set `VITE_API_URL` to the deployed backend URL.
-- Set `CLIENT_URL` on the backend to the deployed frontend URL.
-- Set a strong `JWT_SECRET` in production.
-- Use a production MongoDB connection string in `MONGO_URI`.
-- Run `npm run build` in `frontend` before deploying the React app.
+- Frontend: Vercel  
+- Backend: Render  
+- Database: MongoDB Atlas  
 
-## API Endpoints Overview
+Make sure to configure environment variables on both platforms.
 
-### Auth
+---
 
-- `POST /api/auth/register` - Register a user
-- `POST /api/auth/login` - Log in and receive a JWT
-- `GET /api/auth/me` - Get current authenticated user
+## 🧪 Key Functional Tests
 
-### Events
+- User registration & login  
+- Role-based route protection  
+- Event creation → pending → admin approval  
+- Booking & cancellation  
+- Organizer analytics accuracy  
+- Email delivery  
 
-- `GET /api/events` - Get all events
-- `GET /api/events/:id` - Get one event
-- `POST /api/events` - Create an event, organizer only
-- `PUT /api/events/:id` - Update an event
-- `DELETE /api/events/:id` - Delete an event
+---
 
-### Bookings
+## 📸 Screenshots
 
-- `POST /api/bookings` - Create a booking
-- `GET /api/bookings/my` - Get current user's bookings
-- `PUT /api/bookings/:id/cancel` - Cancel a booking
+Add screenshots of:
+- Dashboard  
+- Events page  
+- Booking flow  
+- Admin panel  
+- Organizer panel  
 
-## Build Commands
+---
 
-Frontend:
+## 🧠 What This Project Demonstrates
 
-```bash
-cd frontend
-npm run build
-```
+- Full-stack MERN development  
+- Scalable REST API design  
+- Role-based system architecture  
+- Real-world business logic (booking, approvals)  
+- Production deployment workflow  
+- Clean UI/UX with Tailwind  
 
-Backend:
+---
 
-```bash
-cd backend
-npm start
-```
+
+
+## 👨‍💻 Author
+
+Omar  
+Full-Stack Developer (MERN)
+
+---
+
+## ⭐ Final Note
+
+Ticketa is built as a production-ready system, designed to reflect real client requirements and scalable architecture.
